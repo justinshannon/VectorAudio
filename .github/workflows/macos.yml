@@ -14,7 +14,6 @@ jobs:
     strategy:
       matrix:
         triplet: ['x64-osx', 'arm64-osx']
-        build_dir: ['x64-build', 'arm64-build']
 
     steps:
     - uses: actions/checkout@v2
@@ -37,17 +36,17 @@ jobs:
     - name: Restore vcpkg from cache
       uses: actions/cache@v3
       with:
-        path: ${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/
+        path: ${{ matrix.triplet }}_build/vcpkg_installed/
         key: ${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
 
     - name: Setup vcpkg
       run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
 
     - name: Configure CMake
-      run: cmake -S "${{ github.workspace }}" -B "${{ matrix.build_dir }}" -DCMAKE_BUILD_TYPE=Release -DVCPKG_INSTALLED_DIR=${{ matrix.build_dir }}/vcpkg_installed/ -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
+      run: cmake -S "${{ github.workspace }}" -B "${{ matrix.triplet }}_build" -DCMAKE_BUILD_TYPE=Release -DVCPKG_INSTALLED_DIR=${{ matrix.triplet }}_build/vcpkg_installed/ -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
 
     - name: Build
-      run: cmake --build "${{ matrix.build_dir }}" --config Release
+      run: cmake --build "${{ matrix.triplet }}_build" --config Release
   
   package:
     needs: [build]
@@ -56,8 +55,8 @@ jobs:
     steps:
     - name: Create universal binary
       run: |
-        lipo -create arm64-build/libafv_native.dylib x64-build/libafv_native.dylib -output build/extern/afv-native/libafv_native.dylib
-        lipo -create arm64-build/vector_audio x64-build/vector_audio -output build/vector_audio
+        lipo -create arm64-osx_build/libafv_native.dylib x64-osx_build/libafv_native.dylib -output build/extern/afv-native/libafv_native.dylib
+        lipo -create arm64-osx_build/vector_audio x64-osx_build/vector_audio -output build/vector_audio
 
     - name: Bundle application
       run: ./bundle_osx.sh
