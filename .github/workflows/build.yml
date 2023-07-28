@@ -14,7 +14,6 @@ jobs:
         include:
           - os: windows-latest
             triplet: x64-windows
-            target: ALL_BUILD
     env:
       CMAKE_BUILD_DIR: ${{ github.workspace }}/build
       VCPKG_ROOT: ${{ github.workspace }}/vcpkg
@@ -23,8 +22,6 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
-
-    - uses: lukka/get-cmake@latest
 
     - name: Restore vcpkg from cache
       uses: actions/cache@v2
@@ -50,4 +47,7 @@ jobs:
       run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
     
     - name: Configure CMake
-      run: cmake -S "${{github.workspace}}" -B "${{env.CMAKE_BUILD_DIR}}" -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=${{matrix.triplet}}
+      run: cmake -S "${{github.workspace}}" -B "${{env.CMAKE_BUILD_DIR}}" -DCMAKE_BUILD_TYPE=Release -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=${{matrix.triplet}}
+
+    - name: Build
+      run: cmake --build "${{env.CMAKE_BUILD_DIR}}" --config Release
