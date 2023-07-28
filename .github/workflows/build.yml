@@ -13,28 +13,23 @@ on:
   push:
     tags:
       - v*
-    inputs:
-      build-type:
-        required: true
-        type: string
-        default: 'release'
 
 jobs:
 
   linux:
     uses: ./.github/workflows/linux.yml
     with:
-      build-type: ${{ github.event.inputs.build-type }}
+      build-type: ${{ github.event.inputs.build-type || 'release' }}
 
   windows:
     uses: ./.github/workflows/windows.yml
     with:
-      build-type: ${{ github.event.inputs.build-type }}
+      build-type: ${{ github.event.inputs.build-type || 'release' }}
 
   macos:
     uses: ./.github/workflows/macos.yml
     with:
-      build-type: ${{ github.event.inputs.build-type }}
+      build-type: ${{ github.event.inputs.build-type || 'release' }}
 
 ########################## Create Release ##########################
 
