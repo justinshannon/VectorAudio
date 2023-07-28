@@ -24,6 +24,7 @@ jobs:
       with:
         path: ${{ github.workspace }}/build/vcpkg_installed/
         key: ${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
+        lookup-only: true
 
     - name: Check if cache exists (macOS)
       if: matrix.triplet == 'x64-osx' || matrix.triplet == 'arm64-osx'
@@ -31,3 +32,4 @@ jobs:
       with:
         path: ${{ matrix.triplet }}_build/vcpkg_installed/
         key: ${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
+        lookup-only: true
