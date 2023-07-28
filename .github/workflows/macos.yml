@@ -42,10 +42,10 @@ jobs:
       run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
 
     - name: Configure CMake
-      run: cmake -S "${{ github.workspace }}" -B "build_${{ matrix.triplet }}" -DCMAKE_BUILD_TYPE=${{ github.event.inputs.build-type ?? 'release' }} -DVCPKG_INSTALLED_DIR=build_${{ matrix.triplet }}/vcpkg_installed/ -DVCPKG_BUILD_TYPE=${{ github.event.inputs.build-type ?? 'release' }} -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -DCMAKE_OSX_ARCHITECTURES=$([[ "${{ matrix.triplet }}" == 'arm64-osx' ]] && echo 'arm64' || echo 'x86_64')
+      run: cmake -S "${{ github.workspace }}" -B "build_${{ matrix.triplet }}" -DCMAKE_BUILD_TYPE=${{ github.event.inputs.build-type || 'release' }} -DVCPKG_INSTALLED_DIR=build_${{ matrix.triplet }}/vcpkg_installed/ -DVCPKG_BUILD_TYPE=${{ github.event.inputs.build-type || 'release' }} -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -DCMAKE_OSX_ARCHITECTURES=$([[ "${{ matrix.triplet }}" == 'arm64-osx' ]] && echo 'arm64' || echo 'x86_64')
 
     - name: Build
-      run: cmake --build "build_${{ matrix.triplet }}" --config ${{ github.event.inputs.build-type ?? 'release' }}
+      run: cmake --build "build_${{ matrix.triplet }}" --config ${{ github.event.inputs.build-type || 'release' }}
 
     - name: Cleanup build files
       run: |
