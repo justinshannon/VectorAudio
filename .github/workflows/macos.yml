@@ -43,7 +43,7 @@ jobs:
       run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
 
     - name: Configure CMake
-      run: cmake -S "${{ github.workspace }}" -B "${{ matrix.triplet }}_build" -DCMAKE_BUILD_TYPE=Release -DVCPKG_INSTALLED_DIR=${{ matrix.triplet }}_build/vcpkg_installed/ -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
+      run: cmake -S "${{ github.workspace }}" -B "${{ matrix.triplet }}_build" -DCMAKE_BUILD_TYPE=Release -DVCPKG_INSTALLED_DIR=${{ matrix.triplet }}_build/vcpkg_installed/ -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -DCMAKE_OSX_ARCHITECTURES=$([[ "${{ matrix.triplet }}" == 'arm64-osx' ]] && echo 'arm64' || echo 'x86_64')
 
     - name: Build
       run: cmake --build "${{ matrix.triplet }}_build" --config Release
