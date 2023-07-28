@@ -57,16 +57,46 @@ jobs:
       run: cmake --build "${{ matrix.triplet }}_build" --config ${{ github.event.inputs.build-type || 'release' }}
 
     - name: Cleanup build files
+      if: matrix.triplet == 'arm64-osx'
       run: |
         cp ${{ matrix.triplet }}_build/extern/afv-native/libafv_native.dylib build/libafv_native.dylib.arm
         cp ${{ matrix.triplet }}_build/vector_audio build/vector_audio.arm
-        rm -rf ${{ matrix.triplet }}_build/
+
+    - name: Cleanup build files
+      if: matrix.triplet == 'x64-osx'
+      run: |
+        cp ${{ matrix.triplet }}_build/extern/afv-native/libafv_native.dylib build/libafv_native.dylib.intel
+        cp ${{ matrix.triplet }}_build/vector_audio build/vector_audio.intel
+
+    - name: Save build artifacts
+      uses: actions/upload-artifact@v2
+      if: matrix.triplet == 'arm64-osx'
+      with:
+        name: build-artifacts
+        path: |
+          build/libafv_native.dylib.arm
+          build/vector_audio.arm
+
+    - name: Save build artifacts
+      uses: actions/upload-artifact@v2
+      if: matrix.triplet == 'x64-osx'
+      with:
+        name: build-artifacts
+        path: |
+          build/libafv_native.dylib.intel
+          build/vector_audio.intel
   
   package:
     needs: [build]
     runs-on: macos-latest
 
     steps:
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: build-artifacts
+
     - name: Create universal binary
       run: |
         lipo -create build/libafv_native.dylib.arm build/libafv_native.dylib.intel -output build/extern/afv-native/libafv_native.dylib
