@@ -36,6 +36,12 @@ jobs:
     - if: matrix.os != 'windows-latest'
       name: Setup vcpkg for Unix
       run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
+
+    - if: matrix.os == 'ubuntu-latest'
+      name: Install SFML dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libx11-dev libxrandr-dev libxi-dev libudev-dev libgl1-mesa-dev libxcursor-dev freeglut3-dev
     
     - name: Configure CMake
       run: cmake -S "${{github.workspace}}" -B "${{env.CMAKE_BUILD_DIR}}" -DCMAKE_BUILD_TYPE=Release -DVCPKG_INSTALLED_DIR=${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/ -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=${{matrix.triplet}}
