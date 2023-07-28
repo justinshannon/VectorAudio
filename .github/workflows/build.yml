@@ -29,14 +29,8 @@ jobs:
         # The first path is where pckpg generates artifacts
         # The second path is the location of vcpkg and its data files
         # The other paths prefixed with "!" are exclusions (they contain temporary files that aren't needed)
-        path: |
-          ${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/
-          ${{ env.VCPKG_ROOT }}
-          !${{ env.VCPKG_ROOT }}/buildtrees
-          !${{ env.VCPKG_ROOT }}/packages
-          !${{ env.VCPKG_ROOT }}/downloads
-        key: |
-          ${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
+        path: ${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/
+        key: ${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
     
     - if: matrix.os == 'windows-latest'
       name: Setup vcpkg for Windows
