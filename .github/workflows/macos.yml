@@ -133,4 +133,4 @@ jobs:
       with:
         name: macOS-${{ env.APP_VERSION }}.zip
         path: |
-          VectorAudio-${{ env.APP_VERSION }}-Universal.dmg
+          VectorAudio-${{ env.APP_VERSION }}-MacOS.dmg
