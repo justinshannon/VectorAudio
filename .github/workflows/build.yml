@@ -6,24 +6,24 @@ env:
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
 jobs:
-  build-windows:
+  windows:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        vcpkg_triplet: ['x64-windows']
+    env:
+      VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_triplet }}
+      GEN: Ninja
+      VCPKG_ROOT: ${{ github.workspace }}\vcpkg
+      VCPKG_TOOLCHAIN_PATH: ${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake
+
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
 
-      # Install latest CMake.
-      - uses: lukka/get-cmake@latest
+      - name: Install latest CMake
+        uses: lukka/get-cmake@latest
 
-      - name: Restore from cache and install vcpkg
+      - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgGitCommitId: '9d47b24eacbd1cd94f139457ef6cd35e5d92cc84'
-          vcpkgJsonGlob: '**/vcpkg.json'
-      
-      - name: Run CMake with vcpkg.json manifest
-        uses: lukka/run-cmake@v10
-        with:
-          configurePreset: 'ninja-multi-vcpkg'
-          buildPreset: 'ninja-multi-vcpkg'
