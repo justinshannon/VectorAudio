@@ -120,6 +120,10 @@ jobs:
         brew install create-dmg
         create-dmg --volname "VectorAudio Installer" --app-drop-link 600 185 --window-size 800 400 --icon "VectorAudio.app" 200 190 "VectorAudio-${{ env.APP_VERSION }}-Universal.dmg" "build/VectorAudio.app"
 
+    - uses: geekyeggo/delete-artifact@v2
+      with:
+        name: build-artifacts
+
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
