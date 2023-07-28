@@ -1,0 +1,61 @@
+name: Build Linux
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+env:
+  CMAKE_BUILD_DIR: ${{ github.workspace }}/build
+  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Get version
+      run: |
+        echo "APP_VERSION=$(cat VERSION)" >> $GITHUB_ENV
+
+    - name: Restore vcpkg from cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/
+        key: ${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
+
+    - name: Setup vcpkg
+      run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libx11-dev libxrandr-dev libxi-dev libudev-dev libgl1-mesa-dev libxcursor-dev freeglut3-dev pkg-config desktop-file-utils
+        sudo add-apt-repository universe
+        sudo apt-get update
+        sudo apt install libfuse2
+
+    - name: Configure CMake
+      run: cmake -S "${{github.workspace}}" -B "${{env.CMAKE_BUILD_DIR}}" -DCMAKE_BUILD_TYPE=Release -DVCPKG_INSTALLED_DIR=${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/ -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=x64-linux
+
+    - name: Build
+      run: cmake --build "${{env.CMAKE_BUILD_DIR}}" --config Release
+
+    - name: Bundle AppImage
+      run: ./bundle_linux.sh libafv_native.so
+
+    - name: Rename installer
+      run: |
+        mv VectorAudio-x86_64.AppImage VectorAudio-${{ env.APP_VERSION }}-x86_64.AppImage
+        mv VectorAudio-x86_64.AppImage.zsync VectorAudio-${{ env.APP_VERSION }}-x86_64.AppImage.zsync
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Linux-${{ env.APP_VERSION }}.zip
+        path: |
+          VectorAudio-${{ env.APP_VERSION }}-x86_64.AppImage
+          VectorAudio-${{ env.APP_VERSION }}-x86_64.AppImage.zsync
