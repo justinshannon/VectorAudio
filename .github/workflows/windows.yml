@@ -36,10 +36,10 @@ jobs:
       run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.bat
 
     - name: Configure CMake
-      run: cmake -S "${{github.workspace}}" -B "${{env.CMAKE_BUILD_DIR}}" -DCMAKE_BUILD_TYPE=${{ github.event.inputs.build-type }} -DVCPKG_INSTALLED_DIR=${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/ -DVCPKG_BUILD_TYPE=${{ github.event.inputs.build-type }} -DVCPKG_TARGET_TRIPLET=${{ env.TRIPLET }}
+      run: cmake -S "${{github.workspace}}" -B "${{env.CMAKE_BUILD_DIR}}" -DCMAKE_BUILD_TYPE=${{ github.event.inputs.build-type ?? 'release' }} -DVCPKG_INSTALLED_DIR=${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/ -DVCPKG_BUILD_TYPE=${{ github.event.inputs.build-type ?? 'release' }} -DVCPKG_TARGET_TRIPLET=${{ env.TRIPLET }}
 
     - name: Build
-      run: cmake --build "${{env.CMAKE_BUILD_DIR}}" --config ${{ github.event.inputs.build-type }}
+      run: cmake --build "${{env.CMAKE_BUILD_DIR}}" --config ${{ github.event.inputs.build-type ?? 'release' }}
 
     - name: Prepare Installer
       run: |
