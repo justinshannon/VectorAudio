@@ -2,6 +2,10 @@ name: Build Linux
 
 on:
   workflow_call:
+    inputs:
+      build-type:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       build-type:
