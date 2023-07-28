@@ -19,7 +19,7 @@ jobs:
         submodules: recursive
 
     - name: Check if cache exists (Windows/Linux)
-      if: runner.os == 'ubuntu-latest' || runner.os == 'windows-latest'
+      if: matrix.triplet == 'x64-linux' || matrix.triplet == 'x64-windows'
       uses: actions/cache/restore@v3
       with:
         path: ${{ github.workspace }}/build/vcpkg_installed/
