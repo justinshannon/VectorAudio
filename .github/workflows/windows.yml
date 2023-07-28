@@ -1,4 +1,4 @@
-name: Build Linux
+name: Build Windows
 
 on:
   workflow_call:
@@ -7,11 +7,11 @@ on:
 env:
   CMAKE_BUILD_DIR: ${{ github.workspace }}/build
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-  TRIPLET: x64-linux
+  TRIPLET: x64-windows
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -23,8 +23,8 @@ jobs:
         python-version: "3.10"
 
     - name: Get version
-      run: |
-        echo "APP_VERSION=$(cat VERSION)" >> $GITHUB_ENV
+      shell: bash
+      run: echo "APP_VERSION=$(cat VERSION)" >> $GITHUB_ENV
 
     - name: Restore vcpkg from cache
       uses: actions/cache@v3
@@ -33,15 +33,7 @@ jobs:
         key: ${{ env.TRIPLET }}-${{ hashFiles('vcpkg.json') }}
 
     - name: Setup vcpkg
-      run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
-
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install libx11-dev libxrandr-dev libxi-dev libudev-dev libgl1-mesa-dev libxcursor-dev freeglut3-dev pkg-config desktop-file-utils
-        sudo add-apt-repository universe
-        sudo apt-get update
-        sudo apt install libfuse2
+      run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.bat
 
     - name: Configure CMake
       run: cmake -S "${{github.workspace}}" -B "${{env.CMAKE_BUILD_DIR}}" -DCMAKE_BUILD_TYPE=Release -DVCPKG_INSTALLED_DIR=${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/ -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=${{ env.TRIPLET }}
@@ -49,18 +41,33 @@ jobs:
     - name: Build
       run: cmake --build "${{env.CMAKE_BUILD_DIR}}" --config Release
 
-    - name: Bundle AppImage
-      run: ./bundle_linux.sh libafv_native.so
+    - name: Prepare Installer
+      run: |
+        python collect_licenses.py
+        mkdir installer
+        cp resources/*.wav installer/
+        cp resources/favicon.ico installer/
+        cp resources/icon_win.png installer/
+        cp resources/*.ttf installer/
+        cp resources/airports.json installer/
+        cp resources/LICENSE.txt installer/
+        cp build/Release/vector_audio.exe installer/
+        cp build/Release/*.dll installer/
+        cp build/extern/afv-native/Release/*.dll installer/
+        cp bundle_windows.nsi installer/install.nsi
+
+    - name: Create installer
+      run: |
+        cd installer/
+        makensis install.nsi
 
     - name: Rename installer
       run: |
-        mv VectorAudio-x86_64.AppImage VectorAudio-${{ env.APP_VERSION }}-x86_64.AppImage
-        mv VectorAudio-x86_64.AppImage.zsync VectorAudio-${{ env.APP_VERSION }}-x86_64.AppImage.zsync
+        mv installer/VectorAudio-installer.exe VectorAudio-${{ env.APP_VERSION }}-Installer.exe
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: Linux-${{ env.APP_VERSION }}.zip
+        name: Windows-${{ env.APP_VERSION }}.zip
         path: |
-          VectorAudio-${{ env.APP_VERSION }}-x86_64.AppImage
-          VectorAudio-${{ env.APP_VERSION }}-x86_64.AppImage.zsync
+          VectorAudio-${{ env.APP_VERSION }}-Installer.exe
