@@ -7,6 +7,7 @@ on:
 env:
   CMAKE_BUILD_DIR: ${{ github.workspace }}/build
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+  TRIPLET: x64-linux
 
 jobs:
   build:
@@ -25,7 +26,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/
-        key: ${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
+        key: ${{ env.TRIPLET }}-${{ hashFiles('vcpkg.json') }}
 
     - name: Setup vcpkg
       run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
@@ -39,7 +40,7 @@ jobs:
         sudo apt install libfuse2
 
     - name: Configure CMake
-      run: cmake -S "${{github.workspace}}" -B "${{env.CMAKE_BUILD_DIR}}" -DCMAKE_BUILD_TYPE=Release -DVCPKG_INSTALLED_DIR=${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/ -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=x64-linux
+      run: cmake -S "${{github.workspace}}" -B "${{env.CMAKE_BUILD_DIR}}" -DCMAKE_BUILD_TYPE=Release -DVCPKG_INSTALLED_DIR=${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/ -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=${{ env.TRIPLET }}
 
     - name: Build
       run: cmake --build "${{env.CMAKE_BUILD_DIR}}" --config Release
