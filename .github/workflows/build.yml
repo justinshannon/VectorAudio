@@ -1,7 +1,15 @@
-name: Build VectorAudio
+name: VectorAudio Release
 
 on:
   workflow_dispatch:
+    inputs:
+      build-type:
+        description: 'Build type (release, debug)'
+        required: true
+        default: 'release'
+        options:
+          - 'release'
+          - 'debug'
   push:
     tags:
       - v*
@@ -10,12 +18,18 @@ jobs:
 
   linux:
     uses: ./.github/workflows/linux.yml
+    with:
+      build-type: ${{ github.event.inputs.build-type }}
 
   windows:
     uses: ./.github/workflows/windows.yml
+    with:
+      build-type: ${{ github.event.inputs.build-type }}
 
   macos:
     uses: ./.github/workflows/macos.yml
+    with:
+      build-type: ${{ github.event.inputs.build-type }}
 
 ########################## Create Release ##########################
 

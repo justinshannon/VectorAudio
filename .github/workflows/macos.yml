@@ -5,7 +5,6 @@ on:
   workflow_dispatch:
 
 env:
-  CMAKE_BUILD_DIR: ${{ github.workspace }}/build
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
 jobs:
@@ -36,17 +35,23 @@ jobs:
     - name: Restore vcpkg from cache
       uses: actions/cache@v3
       with:
-        path: ${{ matrix.triplet }}_build/vcpkg_installed/
+        path: build_${{ matrix.triplet }}/vcpkg_installed/
         key: ${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
 
     - name: Setup vcpkg
       run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
 
     - name: Configure CMake
-      run: cmake -S "${{ github.workspace }}" -B "${{ matrix.triplet }}_build" -DCMAKE_BUILD_TYPE=Release -DVCPKG_INSTALLED_DIR=${{ matrix.triplet }}_build/vcpkg_installed/ -DVCPKG_BUILD_TYPE=release -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -DCMAKE_OSX_ARCHITECTURES=$([[ "${{ matrix.triplet }}" == 'arm64-osx' ]] && echo 'arm64' || echo 'x86_64')
+      run: cmake -S "${{ github.workspace }}" -B "build_${{ matrix.triplet }}" -DCMAKE_BUILD_TYPE=${{ github.event.inputs.build-type }} -DVCPKG_INSTALLED_DIR=build_${{ matrix.triplet }}/vcpkg_installed/ -DVCPKG_BUILD_TYPE=${{ github.event.inputs.build-type }} -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -DCMAKE_OSX_ARCHITECTURES=$([[ "${{ matrix.triplet }}" == 'arm64-osx' ]] && echo 'arm64' || echo 'x86_64')
 
     - name: Build
-      run: cmake --build "${{ matrix.triplet }}_build" --config Release
+      run: cmake --build "build_${{ matrix.triplet }}" --config ${{ github.event.inputs.build-type }}
+
+    - name: Cleanup build files
+      run: |
+        cp build_${{ matrix.triplet }}/extern/afv-native/libafv_native.dylib build/libafv_native.dylib.arm
+        cp build_${{ matrix.triplet }}/vector_audio build/vector_audio.arm
+        rm -rf build_${{ matrix.triplet }}/
   
   package:
     needs: [build]
@@ -55,8 +60,8 @@ jobs:
     steps:
     - name: Create universal binary
       run: |
-        lipo -create arm64-osx_build/libafv_native.dylib x64-osx_build/libafv_native.dylib -output build/extern/afv-native/libafv_native.dylib
-        lipo -create arm64-osx_build/vector_audio x64-osx_build/vector_audio -output build/vector_audio
+        lipo -create build/libafv_native.dylib.arm build/libafv_native.dylib.intel -output build/extern/afv-native/libafv_native.dylib
+        lipo -create build/vector_audio.arm build/vector_audio.intel -output build/vector_audio
 
     - name: Bundle application
       run: ./bundle_osx.sh
