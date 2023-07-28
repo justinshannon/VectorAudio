@@ -3,7 +3,7 @@ name: Cache Refresh
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/1 * * * *" # Run every 5 days at midnight
+    - cron: "*/5 * * * *" # Run every 5 days at midnight
 
 env:
   CMAKE_BUILD_DIR: ${{ github.workspace }}/build
@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        triplet: ["x64-linux", "x64-windows", "x64-osx"]
+        triplet: ["x64-linux", "x64-windows", "x64-osx", "arm64-osx"]
 
     steps:
     - uses: actions/checkout@v2
