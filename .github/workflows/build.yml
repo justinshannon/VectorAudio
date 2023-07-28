@@ -1,0 +1,29 @@
+name: Build
+
+on: push
+
+env:
+  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Restore from cache and install vcpkg
+        uses: lukka/run-vckpg@v11
+        with:
+          vcpkgGitCommitId: '9d47b24eacbd1cd94f139457ef6cd35e5d92cc84'
+          vcpkgJsonGlob: '**/vcpkg.json'
+      
+      - name: Run CMake with vcpkg.json manifest
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'ninja-multi-vcpkg'
+          buildPreset: 'ninja-multi-vcpkg'
+
+      
+
