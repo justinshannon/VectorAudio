@@ -7,11 +7,11 @@ on:
 
 jobs:
   refresh-cache:
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
         triplet: ["x64-linux", "x64-windows", "x64-osx", "arm64-osx"]
+
+    runs-on: ${{ matrix.triplet == 'x64-linux' && 'ubuntu-latest' || matrix.triplet == 'x64-windows' && 'windows-latest' || 'macos-latest' }}
 
     steps:
     - uses: actions/checkout@v3
@@ -19,7 +19,7 @@ jobs:
         submodules: recursive
 
     - name: Check if cache exists (Windows/Linux)
-      if: matrix.triplet == 'x64-linux' || matrix.triplet == 'x64-windows'
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest'
       uses: actions/cache/restore@v3
       with:
         path: ${{ github.workspace }}/build/vcpkg_installed/
