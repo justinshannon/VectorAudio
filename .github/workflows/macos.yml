@@ -82,7 +82,7 @@ jobs:
           build/vector_audio.arm
 
     - name: Save build artifacts (x64)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       if: matrix.triplet == 'x64-osx'
       with:
         name: build-artifacts
