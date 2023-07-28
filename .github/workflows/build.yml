@@ -13,11 +13,11 @@ on:
   push:
     tags:
       - v*
-      inputs:
-        build-type:
-          required: true
-          type: string
-          default: 'release'
+    inputs:
+      build-type:
+        required: true
+        type: string
+        default: 'release'
 
 jobs:
 
