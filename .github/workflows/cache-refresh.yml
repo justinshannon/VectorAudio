@@ -27,7 +27,7 @@ jobs:
         lookup-only: true
 
     - name: Check if cache exists (macOS)
-      if: runner.os == 'Mac'
+      if: runner.os == 'macOS'
       uses: actions/cache@v3
       with:
         path: ${{ matrix.triplet }}_build/vcpkg_installed/
