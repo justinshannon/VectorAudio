@@ -19,7 +19,7 @@ jobs:
         submodules: recursive
 
     - name: Check if cache exists (Windows/Linux)
-      if: runner.os == 'Linux' || runner.os == 'Windows'
+      if: matrix.triplet == 'x64-linux' || matrix.triplet == 'x64-windows'
       uses: actions/cache@v3
       with:
         path: ${{ github.workspace }}/build/vcpkg_installed/
@@ -27,7 +27,7 @@ jobs:
         lookup-only: true
 
     - name: Check if cache exists (macOS)
-      if: runner.os == 'macOS'
+      if: matrix.triplet == 'x64-osx' || matrix.triplet == 'arm64-osx'
       uses: actions/cache@v3
       with:
         path: ${{ matrix.triplet }}_build/vcpkg_installed/
