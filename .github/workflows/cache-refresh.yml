@@ -3,7 +3,7 @@ name: Cache Refresh
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 * * * *" # Run every hour
+    - cron: "0 1 * * *" # Run every day at 0100 UTC
 
 jobs:
   refresh-cache:
