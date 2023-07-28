@@ -8,6 +8,7 @@ on:
         description: 'Build type (release, debug)'
         required: true
         default: 'release'
+        type: choice
         options:
           - 'release'
           - 'debug'
