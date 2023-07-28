@@ -20,14 +20,14 @@ jobs:
 
     - name: Check if cache exists (Windows/Linux)
       if: matrix.triplet == 'x64-linux' || matrix.triplet == 'x64-windows'
-      uses: actions/cache@v3
+      uses: actions/cache/restore@v3
       with:
         path: ${{ github.workspace }}/build/vcpkg_installed/
         key: ${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
 
     - name: Check if cache exists (macOS)
       if: matrix.triplet == 'x64-osx' || matrix.triplet == 'arm64-osx'
-      uses: actions/cache@v3
+      uses: actions/cache/restore@v3
       with:
         path: ${{ matrix.triplet }}_build/vcpkg_installed/
         key: ${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
