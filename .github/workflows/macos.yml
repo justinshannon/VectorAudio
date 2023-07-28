@@ -99,9 +99,7 @@ jobs:
         path: build
 
     - name: Create universal build folder
-      run: |
-        mkdir build/
-        mkdir -p build/extern/afv-native/
+      run: mkdir -p build/extern/afv-native/
 
     - name: Create universal binary
       run: |
