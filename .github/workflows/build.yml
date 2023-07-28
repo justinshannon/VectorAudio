@@ -33,43 +33,43 @@ jobs:
 
 ########################## Create Release ##########################
 
-release:
-  runs-on: ubuntu-latest
-  needs: [linux, windows, macos]
-  if: github.ref_type == 'tag' && contains(github.ref_name, 'v') && github.event.inputs.build-type == 'release'
+  release:
+    runs-on: ubuntu-latest
+    needs: [linux, windows, macos]
+    if: github.ref_type == 'tag' && contains(github.ref_name, 'v') && github.event.inputs.build-type == 'release'
 
-  steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v3
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
 
-    - name: Get version
-      id: get_version
-      uses: battila7/get-version-action@v2
+      - name: Get version
+        id: get_version
+        uses: battila7/get-version-action@v2
 
-    - name: Create release notes
-      run: |
-        cat > CHANGELOG.txt << EOF
-        ## Download
-        - [Windows](https://github.com/${{ GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VectorAudio-${{ steps.get_version.outputs.version-without-v }}-Windows.exe)
-        - [macOS](https://github.com/${{ GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VectorAudio-${{ steps.get_version.outputs.version-without-v }}-MacOS.dmg)
-        - [Linux](https://github.com/${{ GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VecorAudio-${{ steps.get_version.outputs.version-without-v }}-Linux.AppImage)
+      - name: Create release notes
+        run: |
+          cat > CHANGELOG.txt << EOF
+          ## Download
+          - [Windows](https://github.com/${{ GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VectorAudio-${{ steps.get_version.outputs.version-without-v }}-Windows.exe)
+          - [macOS](https://github.com/${{ GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VectorAudio-${{ steps.get_version.outputs.version-without-v }}-MacOS.dmg)
+          - [Linux](https://github.com/${{ GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VecorAudio-${{ steps.get_version.outputs.version-without-v }}-Linux.AppImage)
 
-        ---
+          ---
 
-        ### Added
+          ### Added
 
-        ### Changed
+          ### Changed
 
-        ### Fixed
-        EOF
+          ### Fixed
+          EOF
 
-    - name: Create release
-      uses: softprops/action-gh-release@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        name: VectorAudio ${{ steps.get_version.outputs.version }}
-        prerelease: true
-        draft: true
-        body_path: CHANGELOG.txt
-        files: VectorAudio*
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          name: VectorAudio ${{ steps.get_version.outputs.version }}
+          prerelease: true
+          draft: true
+          body_path: CHANGELOG.txt
+          files: VectorAudio*
