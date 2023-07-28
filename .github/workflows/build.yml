@@ -2,28 +2,52 @@ name: Build
 
 on: push
 
-env:
-  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-
 jobs:
-  windows:
-    runs-on: windows-latest
+  build:
+
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        vcpkg_triplet: ['x64-windows']
+        os: [windows-latest]
+        include:
+          - os: windows-latest
+            triplet: x64-windows
+            target: ALL_BUILD
     env:
-      VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_triplet }}
-      GEN: Ninja
-      VCPKG_ROOT: ${{ github.workspace }}\vcpkg
-      VCPKG_TOOLCHAIN_PATH: ${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake
+      CMAKE_BUILD_DIR: ${{ github.workspace }}/build
+      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
-      - name: Install latest CMake
-        uses: lukka/get-cmake@latest
+    - uses: lukka/get-cmake@latest
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
+    - name: Restore vcpkg from cache
+      uses: actions/cache@v2
+      with:
+        # The first path is where pckpg generates artifacts
+        # The second path is the location of vcpkg and its data files
+        # The other paths prefixed with "!" are exclusions (they contain temporary files that aren't needed)
+        path: |
+          ${{ env.CMAKE_BUILD_DIR }}/vcpkg_installed/
+          ${{ env.VCPKG_ROOT }}
+          !${{ env.VCPKG_ROOT }}/buildtrees
+          !${{ env.VCPKG_ROOT }}/packages
+          !${{ env.VCPKG_ROOT }}/downloads
+        key: |
+          ${{ hashFiles( 'vcpkg_manifest/vcpkg.json' ) }}-${{ hashFiles( '.git/modules/vcpkg/HEAD' )}}-${{ hashFiles( '${{ env.VCPKG_ROOT }}/.git/HEAD' )}}-${{ matrix.triplet }}
+    
+    - if: matrix.os == 'windows-latest'
+      name: Setup vcpkg for Windows
+      run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.bat
+
+    - if: matrix.os != 'windows-latest'
+      name: Setup vcpkg for Unix
+      run: ${{ env.VCPKG_ROOT }}/bootstrap-vcpkg.sh
+    
+    - name: Configure CMake
+      run: cmake -S "${{github.workspace}}" -B "${{env.CMAKE_BUILD_DIR}}" -DVCPKG_TARGET_TRIPLET=${{matrix.triplet}}
