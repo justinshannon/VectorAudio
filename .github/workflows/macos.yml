@@ -3,6 +3,14 @@ name: Build macOS
 on:
   workflow_call:
   workflow_dispatch:
+    inputs:
+      build-type:
+        description: 'Build type (release, debug)'
+        required: true
+        default: 'release'
+        options:
+          - 'release'
+          - 'debug'
 
 env:
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
