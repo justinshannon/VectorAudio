@@ -3,7 +3,7 @@ name: Cache Refresh
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 */5 * *" # Run every 5 days at midnight
+    - cron: "*/1 * * * *" # Run every 5 days at midnight
 
 env:
   CMAKE_BUILD_DIR: ${{ github.workspace }}/build
