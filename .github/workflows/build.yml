@@ -50,9 +50,9 @@ jobs:
         run: |
           cat > CHANGELOG.txt << EOF
           ## Download
-          - [Windows](https://github.com/${{ GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VectorAudio-${{ steps.get_version.outputs.version-without-v }}-Windows.exe)
-          - [macOS](https://github.com/${{ GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VectorAudio-${{ steps.get_version.outputs.version-without-v }}-MacOS.dmg)
-          - [Linux](https://github.com/${{ GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VecorAudio-${{ steps.get_version.outputs.version-without-v }}-Linux.AppImage)
+          - [Windows](https://github.com/${{ env.GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VectorAudio-${{ steps.get_version.outputs.version-without-v }}-Windows.exe)
+          - [macOS](https://github.com/${{ env.GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VectorAudio-${{ steps.get_version.outputs.version-without-v }}-MacOS.dmg)
+          - [Linux](https://github.com/${{ env.GITHUB_REPOSITORY }}/releases/download/${{ steps.get_version.outputs.version }}/VecorAudio-${{ steps.get_version.outputs.version-without-v }}-Linux.AppImage)
 
           ---
 
