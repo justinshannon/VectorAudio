@@ -48,3 +48,7 @@ jobs:
 
     - name: Build
       run: cmake --build "${{env.CMAKE_BUILD_DIR}}" --config Release
+
+    - if: matrix.os == 'ubuntu-latest'
+      name: Bundle Linux
+      run: ./bundle_linux.sh libafv_native.so
