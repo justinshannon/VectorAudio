@@ -13,8 +13,11 @@ jobs:
         with:
           submodules: recursive
 
+      # Install latest CMake.
+      - uses: lukka/get-cmake@latest
+
       - name: Restore from cache and install vcpkg
-        uses: lukka/run-vckpg@v11
+        uses: lukka/run-vcpkg@v11
         with:
           vcpkgGitCommitId: '9d47b24eacbd1cd94f139457ef6cd35e5d92cc84'
           vcpkgJsonGlob: '**/vcpkg.json'
@@ -24,6 +27,3 @@ jobs:
         with:
           configurePreset: 'ninja-multi-vcpkg'
           buildPreset: 'ninja-multi-vcpkg'
-
-      
-
