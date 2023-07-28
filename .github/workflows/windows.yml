@@ -76,7 +76,7 @@ jobs:
 
     - name: Rename installer
       run: |
-        mv installer/VectorAudio-installer.exe VectorAudio-${{ env.APP_VERSION }}-Installer.exe
+        mv installer/VectorAudio-installer.exe VectorAudio-${{ env.APP_VERSION }}-Windows.exe
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
