@@ -1,0 +1,25 @@
+name: Cache Refresh
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 */5 * *" # Run every 5 days at midnight
+
+jobs:
+  refresh-cache:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        triplet: ["x64-linux", "x64-windows", "x64-osx"]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Check if cache exists
+      uses: actions/cache@v3
+      with:
+        key: ${{ matrix.triplet }}-${{ hashFiles('vcpkg.json') }}
+        lookup-only: true
