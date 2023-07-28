@@ -39,7 +39,7 @@ jobs:
           !${{ env.VCPKG_ROOT }}/packages
           !${{ env.VCPKG_ROOT }}/downloads
         key: |
-          ${{ hashFiles( 'vcpkg_manifest/vcpkg.json' ) }}-${{ hashFiles( '.git/modules/vcpkg/HEAD' )}}-${{ hashFiles( '${{ env.VCPKG_ROOT }}/.git/HEAD' )}}-${{ matrix.triplet }}
+          ${{ matrix.triplet }}-${{ hashFiles( 'vcpkg.json' ) }}-${{ hashFiles( '.git/modules/vcpkg/HEAD' )}}-${{ hashFiles( '${{ env.VCPKG_ROOT }}/.git/HEAD' )}}
     
     - if: matrix.os == 'windows-latest'
       name: Setup vcpkg for Windows
